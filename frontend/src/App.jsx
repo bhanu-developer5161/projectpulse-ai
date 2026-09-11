@@ -1,5 +1,8 @@
-
 import { useEffect, useState } from "react";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://127.0.0.1:8000";
 
 function App() {
   const [content, setContent] = useState("");
@@ -23,7 +26,7 @@ function App() {
   const fetchCommunications = async () => {
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/api/communications/"
+        API_BASE_URL + "/api/communications/"
       );
 
       if (!response.ok) {
@@ -44,7 +47,8 @@ function App() {
   const fetchDashboard = async () => {
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/api/communications/dashboard/"
+        API_BASE_URL +
+          "/api/communications/dashboard/"
       );
 
       if (!response.ok) {
@@ -78,7 +82,8 @@ function App() {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:8000/api/communications/",
+        API_BASE_URL +
+          "/api/communications/",
         {
           method: "POST",
           headers: {
@@ -96,10 +101,19 @@ function App() {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to save communication");
+        const errorData =
+          await response.json().catch(() => null);
+
+        throw new Error(
+          errorData?.error ||
+            "Failed to save communication"
+        );
       }
 
-      setMessage("Communication added successfully!");
+      setMessage(
+        "Communication added successfully!"
+      );
+
       setContent("");
 
       await fetchCommunications();
@@ -110,7 +124,10 @@ function App() {
         error
       );
 
-      setMessage("Failed to add communication.");
+      setMessage(
+        "Failed to add communication: " +
+          error.message
+      );
     }
   };
 
@@ -121,7 +138,8 @@ function App() {
       setMessage("");
 
       const url =
-        "http://127.0.0.1:8000/api/communications/" +
+        API_BASE_URL +
+        "/api/communications/" +
         id +
         "/analyze/";
 
@@ -137,13 +155,17 @@ function App() {
           await response.json().catch(() => null);
 
         throw new Error(
-          errorData?.error || "Analysis failed"
+          errorData?.error ||
+            "Analysis failed"
         );
       }
 
       const data = await response.json();
 
-      console.log("Analysis result:", data);
+      console.log(
+        "Analysis result:",
+        data
+      );
 
       setAnalysis((previous) => ({
         ...previous,
@@ -153,7 +175,10 @@ function App() {
       await fetchCommunications();
       await fetchDashboard();
     } catch (error) {
-      console.error("Analysis failed:", error);
+      console.error(
+        "Analysis failed:",
+        error
+      );
 
       setMessage(
         "Failed to analyze communication: " +
@@ -176,13 +201,16 @@ function App() {
       }
 
       const communicationContent =
-        communication.content?.toLowerCase() || "";
+        communication.content?.toLowerCase() ||
+        "";
 
       const communicationSource =
-        communication.source?.toLowerCase() || "";
+        communication.source?.toLowerCase() ||
+        "";
 
       const communicationSummary =
-        communication.summary?.toLowerCase() || "";
+        communication.summary?.toLowerCase() ||
+        "";
 
       const decisions = Array.isArray(
         communication.decisions
@@ -218,9 +246,15 @@ function App() {
         : "";
 
       return (
-        communicationContent.includes(searchText) ||
-        communicationSource.includes(searchText) ||
-        communicationSummary.includes(searchText) ||
+        communicationContent.includes(
+          searchText
+        ) ||
+        communicationSource.includes(
+          searchText
+        ) ||
+        communicationSummary.includes(
+          searchText
+        ) ||
         decisions.includes(searchText) ||
         actionItems.includes(searchText) ||
         risks.includes(searchText)
@@ -242,7 +276,8 @@ function App() {
         (item) => {
           return {
             ...item,
-            communicationId: communication.id,
+            communicationId:
+              communication.id,
           };
         }
       );
@@ -254,8 +289,8 @@ function App() {
       <h1>ProjectPulse AI</h1>
 
       <p>
-        Make project communication intelligent, not
-        overwhelming.
+        Make project communication intelligent,
+        not overwhelming.
       </p>
 
       <hr />
@@ -264,22 +299,30 @@ function App() {
       <h2>Project Dashboard</h2>
 
       <p>
-        <strong>Communications:</strong>{" "}
+        <strong>
+          Communications:
+        </strong>{" "}
         {dashboard.total_communications}
       </p>
 
       <p>
-        <strong>Decisions:</strong>{" "}
+        <strong>
+          Decisions:
+        </strong>{" "}
         {dashboard.total_decisions}
       </p>
 
       <p>
-        <strong>Action Items:</strong>{" "}
+        <strong>
+          Action Items:
+        </strong>{" "}
         {dashboard.total_action_items}
       </p>
 
       <p>
-        <strong>Risks:</strong>{" "}
+        <strong>
+          Risks:
+        </strong>{" "}
         {dashboard.total_risks}
       </p>
 
@@ -298,21 +341,39 @@ function App() {
         <select
           value={source}
           onChange={(event) => {
-            setSource(event.target.value);
+            setSource(
+              event.target.value
+            );
           }}
         >
-          <option value="whatsapp">WhatsApp</option>
-          <option value="email">Email</option>
-          <option value="site">Site Update</option>
-          <option value="client">Client</option>
-          <option value="supplier">Supplier</option>
+          <option value="whatsapp">
+            WhatsApp
+          </option>
+
+          <option value="email">
+            Email
+          </option>
+
+          <option value="site">
+            Site Update
+          </option>
+
+          <option value="client">
+            Client
+          </option>
+
+          <option value="supplier">
+            Supplier
+          </option>
         </select>
 
         <br />
         <br />
 
         <label>
-          <strong>Communication</strong>
+          <strong>
+            Communication
+          </strong>
         </label>
 
         <br />
@@ -320,7 +381,9 @@ function App() {
         <textarea
           value={content}
           onChange={(event) => {
-            setContent(event.target.value);
+            setContent(
+              event.target.value
+            );
           }}
           placeholder="Paste project communication here..."
           rows="8"
@@ -343,7 +406,9 @@ function App() {
       <h2>Project Tasks</h2>
 
       {tasks.length === 0 ? (
-        <p>No tasks identified yet.</p>
+        <p>
+          No tasks identified yet.
+        </p>
       ) : (
         <ul>
           {tasks.map((task, index) => (
@@ -355,18 +420,21 @@ function App() {
               }
             >
               <strong>
-                {task.task || "Task not specified"}
+                {task.task ||
+                  "Task not specified"}
               </strong>
 
               <br />
 
               Responsible:{" "}
-              {task.person || "Not specified"}
+              {task.person ||
+                "Not specified"}
 
               <br />
 
               Deadline:{" "}
-              {task.deadline || "Not specified"}
+              {task.deadline ||
+                "Not specified"}
             </li>
           ))}
         </ul>
@@ -381,7 +449,9 @@ function App() {
         type="text"
         value={searchTerm}
         onChange={(event) => {
-          setSearchTerm(event.target.value);
+          setSearchTerm(
+            event.target.value
+          );
         }}
         placeholder="Search communications, decisions, tasks..."
         size="50"
@@ -390,9 +460,12 @@ function App() {
       <br />
       <br />
 
-      <h2>Recent Communications</h2>
+      <h2>
+        Recent Communications
+      </h2>
 
-      {filteredCommunications.length === 0 ? (
+      {filteredCommunications.length ===
+      0 ? (
         <p>
           {communications.length === 0
             ? "No communications yet."
@@ -402,7 +475,9 @@ function App() {
         filteredCommunications.map(
           (communication) => {
             const currentAnalysis =
-              analysis[communication.id];
+              analysis[
+                communication.id
+              ];
 
             const decisions =
               Array.isArray(
@@ -443,12 +518,16 @@ function App() {
               "";
 
             return (
-              <div key={communication.id}>
+              <div
+                key={communication.id}
+              >
                 <h3>
                   {communication.source}
                 </h3>
 
-                <p>{communication.content}</p>
+                <p>
+                  {communication.content}
+                </p>
 
                 <small>
                   {new Date(
@@ -478,11 +557,15 @@ function App() {
 
                 {(currentAnalysis ||
                   summary ||
-                  decisions.length > 0 ||
-                  actionItems.length > 0 ||
+                  decisions.length >
+                    0 ||
+                  actionItems.length >
+                    0 ||
                   risks.length > 0) && (
                   <div>
-                    <h4>AI Analysis</h4>
+                    <h4>
+                      AI Analysis
+                    </h4>
 
                     <p>
                       <strong>
@@ -498,11 +581,17 @@ function App() {
                       </strong>
                     </p>
 
-                    {decisions.length > 0 ? (
+                    {decisions.length >
+                    0 ? (
                       <ul>
                         {decisions.map(
-                          (decision, index) => (
-                            <li key={index}>
+                          (
+                            decision,
+                            index
+                          ) => (
+                            <li
+                              key={index}
+                            >
                               {decision}
                             </li>
                           )
@@ -510,7 +599,8 @@ function App() {
                       </ul>
                     ) : (
                       <p>
-                        No decisions identified.
+                        No decisions
+                        identified.
                       </p>
                     )}
 
@@ -520,11 +610,17 @@ function App() {
                       </strong>
                     </p>
 
-                    {actionItems.length > 0 ? (
+                    {actionItems.length >
+                    0 ? (
                       <ul>
                         {actionItems.map(
-                          (item, index) => (
-                            <li key={index}>
+                          (
+                            item,
+                            index
+                          ) => (
+                            <li
+                              key={index}
+                            >
                               {item.person ||
                                 "Not specified"}{" "}
                               -{" "}
@@ -539,7 +635,8 @@ function App() {
                       </ul>
                     ) : (
                       <p>
-                        No action items identified.
+                        No action items
+                        identified.
                       </p>
                     )}
 
@@ -549,11 +646,17 @@ function App() {
                       </strong>
                     </p>
 
-                    {risks.length > 0 ? (
+                    {risks.length >
+                    0 ? (
                       <ul>
                         {risks.map(
-                          (risk, index) => (
-                            <li key={index}>
+                          (
+                            risk,
+                            index
+                          ) => (
+                            <li
+                              key={index}
+                            >
                               {risk}
                             </li>
                           )
@@ -561,7 +664,8 @@ function App() {
                       </ul>
                     ) : (
                       <p>
-                        No risks identified.
+                        No risks
+                        identified.
                       </p>
                     )}
                   </div>
@@ -578,4 +682,3 @@ function App() {
 }
 
 export default App;
-
